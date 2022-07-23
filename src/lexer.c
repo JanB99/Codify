@@ -77,7 +77,7 @@ void initTokenList(TokenList* list){
     list->max = LIST_SIZE;
 }
 
-void addToken(TokenList* list, enum TokenType type, Color color){
+void addToken(TokenList* list, enum TokenType type){
     if (list->index == list->max){
         list->max *= 2;
         list->tokens = realloc(list->tokens, sizeof(Token) * list->max);
@@ -93,12 +93,8 @@ void addToken(TokenList* list, enum TokenType type, Color color){
     }
     lexeme[i - start] = '\0';
 
-    // printf("LEXEME size (%ld, %ld): ", current - start + 1, i);
-    // for (int j = 0; lexeme[j] != '\0'; j++) printf("%c(%d)", lexeme[j], j);
-    // printf("\n");
     list->tokens[list->index].type = type;
     list->tokens[list->index].lexeme = lexeme;
-    list->tokens[list->index].c = color;
     list->index++;
 }
 
@@ -117,12 +113,12 @@ void addString(TokenList* list){
         exit(1);
     }
     advance();
-    addToken(list, STRING, (Color){239, 91, 12});
+    addToken(list, STRING);
 }
 
 void addPreprocessor(TokenList* list){
     for (; peek() != ' ' && current < source_len; advance());
-    addToken(list, PREPROC, (Color){60, 207, 78});
+    addToken(list, PREPROC);
 }
 
 void addNumber(TokenList* list){
@@ -134,11 +130,11 @@ void addNumber(TokenList* list){
 
     }
     
-    addToken(list, NUMBER, (Color){127, 82, 131});
+    addToken(list, NUMBER);
 }
 
 void addIdentifier(TokenList* list){
-    while (isalnum(peek())) advance();
+    while (isalnum(peek()) || peek() == '_') advance();
 
     char* text = malloc(current - start + 1);
     if (text == NULL) {
@@ -151,7 +147,7 @@ void addIdentifier(TokenList* list){
 
     Hashlist* h = lookup(text);
     free(text);
-    h == NULL ? addToken(list, IDENTIFIER, (Color){144, 122, 111}) : addToken(list, h->val, (Color){214, 28, 78});
+    h == NULL ? addToken(list, IDENTIFIER) : addToken(list, h->val);
 }
 
 TokenList* tokenize(char* input){
@@ -185,38 +181,38 @@ TokenList* tokenize(char* input){
         start = current;
         char c = advance();
         switch (c){
-            case '(': addToken(list, LEFT_PAREN, (Color){255, 255, 255}); break;
-            case ')': addToken(list, RIGHT_PAREN, (Color){255, 255, 255}); break;
-            case '{': addToken(list, LEFT_BRACE, (Color){255, 255, 255}); break;
-            case '}': addToken(list, RIGHT_BRACE, (Color){255, 255, 255}); break;
-            case '[': addToken(list, LEFT_BRACKET, (Color){255, 255, 255}); break;
-            case ']': addToken(list, RIGHT_BRACKET, (Color){255, 255, 255}); break;
-            case '-': addToken(list, match('-') ? DECR : match('=') ? MINUS_EQUAL : MINUS, (Color){255, 255, 255}); break;
-            case '+': addToken(list, match('+') ? INCR : match('=') ? PLUS_EQUAL : PLUS, (Color){255, 255, 255}); break;
-            case '*': addToken(list, match('=') ? STAR_EQUAL : STAR, (Color){255, 255, 255}); break;
-            case '%': addToken(list, match('=') ? MODULO_EQUAL : MODULO, (Color){255, 255, 255}); break;
-            case '/': addToken(list, match('=') ? SLASH_EQUAL : SLASH, (Color){255, 255, 255}); break;
-            case '<': addToken(list, match('<') ? LEFT_SHIFT : match('=') ? LESS_EQUAL : LESS, (Color){255, 255, 255}); break;
-            case '>': addToken(list, match('>') ? RIGHT_SHIFT : match('=') ? GREATER_EQUAL : GREATER, (Color){255, 255, 255}); break;
-            case '=': addToken(list, match('=') ? EQUAL_EQUAL : EQUAL, (Color){255, 255, 255}); break;
-            case '!': addToken(list, match('=') ? BANG_EQUAL : BANG, (Color){255, 255, 255}); break;
-            case ';': addToken(list, SEMICOLON, (Color){255, 255, 255}); break;
-            case '.': addToken(list, DOT, (Color){255, 255, 255}); break;
-            case ',': addToken(list, COMMA, (Color){255, 255, 255}); break;
-            case '&': addToken(list, match('&') ? AND : BIT_AND, (Color){255, 255, 255}); break;
-            case '|': addToken(list, match('|') ? OR : BIT_OR, (Color){255, 255, 255}); break;
-            case '^': addToken(list, XOR, (Color){255, 255, 255}); break;
-            case '~': addToken(list, BIT_NOT,(Color){255, 255, 255}); break;
+            case '(': addToken(list, LEFT_PAREN); break;
+            case ')': addToken(list, RIGHT_PAREN); break;
+            case '{': addToken(list, LEFT_BRACE); break;
+            case '}': addToken(list, RIGHT_BRACE); break;
+            case '[': addToken(list, LEFT_BRACKET); break;
+            case ']': addToken(list, RIGHT_BRACKET); break;
+            case '-': addToken(list, match('-') ? DECR : match('=') ? MINUS_EQUAL : MINUS); break;
+            case '+': addToken(list, match('+') ? INCR : match('=') ? PLUS_EQUAL : PLUS); break;
+            case '*': addToken(list, match('=') ? STAR_EQUAL : STAR); break;
+            case '%': addToken(list, match('=') ? MODULO_EQUAL : MODULO); break;
+            case '/': addToken(list, match('=') ? SLASH_EQUAL : SLASH); break;
+            case '<': addToken(list, match('<') ? LEFT_SHIFT : match('=') ? LESS_EQUAL : LESS); break;
+            case '>': addToken(list, match('>') ? RIGHT_SHIFT : match('=') ? GREATER_EQUAL : GREATER); break;
+            case '=': addToken(list, match('=') ? EQUAL_EQUAL : EQUAL); break;
+            case '!': addToken(list, match('=') ? BANG_EQUAL : BANG); break;
+            case ';': addToken(list, SEMICOLON); break;
+            case '.': addToken(list, DOT); break;
+            case ',': addToken(list, COMMA); break;
+            case '&': addToken(list, match('&') ? AND : BIT_AND); break;
+            case '|': addToken(list, match('|') ? OR : BIT_OR); break;
+            case '^': addToken(list, XOR); break;
+            case '~': addToken(list, BIT_NOT); break;
 
             case ' ': {
                 for (; peek() == ' ' && current < source_len; advance());
-                addToken(list, WHITE_SPACE, (Color){0, 0, 0});
+                addToken(list, WHITE_SPACE);
             } break;
-            case '\r': addToken(list, CARR_SPACE, (Color){0, 0, 0}); break;
-            case '\t': addToken(list, TAB_SPACE, (Color){0, 0, 0}); break;
-            case '\n': addToken(list, NEW_LINE, (Color){0, 0, 0}); break;
+            case '\r': addToken(list, CARR_SPACE); break;
+            case '\t': addToken(list, TAB_SPACE); break;
+            case '\n': addToken(list, NEW_LINE); break;
 
-            case '\0': addToken(list, ENDFILE, (Color){0, 0, 0}); return list;
+            case '\0': addToken(list, ENDFILE); return list;
 
             case '"': addString(list); break;
             case '#': addPreprocessor(list); break;

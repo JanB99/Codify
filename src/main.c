@@ -3,19 +3,23 @@
 #include <time.h> 
 
 int main(int argc, char **argv){
-    (void) argc; (void) argv;
-    char* text = loadFile("./resources/test.c");
+    
+    if (argc != 2) {
+        fprintf(stderr, "Supply exactly 1 argument for the raw source code path.\n");
+        exit(1);
+    }
+    char* text = loadFile(argv[1]);
 
     State* state = init("Codify", WIDTH, HEIGHT);
-    Font* f = init_font("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf");
-
+    Font* f = init_font("resources/LiberationMono-Bold.ttf");
+    
     TokenList* tokenList = tokenize(text);
-    printf("RESULT:\n");
+    printf("RAW TEXT:\n");
     for (size_t i = 0; i < tokenList->index; i++){
         printf("%s", tokenList->tokens[i].lexeme);
     }
 
-    render_text(state, f, tokenList, 50, 50, 0.2);
+    render_text(state, f, tokenList, 50, 50, 0.25);
 
     const int frameDelay = 1000/FPS;
     uint32_t frameStart;
@@ -26,7 +30,6 @@ int main(int argc, char **argv){
         frameStart = SDL_GetTicks();
 
         handleEvents(state);
-        
         frameTime = SDL_GetTicks() - frameStart;
         if (frameDelay > frameTime){
             SDL_Delay(frameDelay - frameTime);

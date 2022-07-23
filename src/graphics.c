@@ -30,6 +30,83 @@ void handleEvents(State* state){
     }
 }
 
+static const Color palette[] = {
+    (Color){255, 255, 255}, // +
+    (Color){255, 255, 255}, // - 
+    (Color){255, 255, 255}, // * 
+    (Color){255, 255, 255}, // / 
+    (Color){255, 255, 255}, // % 
+    (Color){255, 255, 255}, // --
+    (Color){255, 255, 255}, // ++
+    (Color){255, 255, 255}, // <<
+    (Color){255, 255, 255}, // >>
+
+    (Color){255, 255, 255}, // (  
+    (Color){255, 255, 255}, // )  
+    (Color){255, 255, 255}, // {  
+    (Color){255, 255, 255}, // }  
+    (Color){255, 255, 255}, // [  
+    (Color){255, 255, 255}, // ]  
+    (Color){255, 255, 255}, // ;  
+    (Color){255, 255, 255}, // ,  
+    (Color){255, 255, 255}, // .  
+    (Color){255, 255, 255}, // ?  
+    (Color){255, 255, 255}, // :  
+
+    (Color){255, 255, 255}, // =  
+    (Color){255, 255, 255}, // == 
+    (Color){255, 255, 255}, // !  
+    (Color){255, 255, 255}, // != 
+    (Color){255, 255, 255}, // <  
+    (Color){255, 255, 255}, // <= 
+    (Color){255, 255, 255}, // >  
+    (Color){255, 255, 255}, // >= 
+    (Color){255, 255, 255}, // && 
+    (Color){255, 255, 255}, // || 
+    (Color){255, 255, 255}, // &  
+    (Color){255, 255, 255}, // |  
+    (Color){255, 255, 255}, // ^  
+    (Color){255, 255, 255}, // ~  
+
+    (Color){255, 255, 255}, // += 
+    (Color){255, 255, 255}, // -= 
+    (Color){255, 255, 255}, // *= 
+    (Color){255, 255, 255}, // /= 
+    (Color){255, 255, 255}, // %= 
+
+    (Color){200, 182, 226}, // const       
+    (Color){200, 182, 226}, // int         
+    (Color){200, 182, 226}, // double      
+    (Color){200, 182, 226}, // float       
+    (Color){200, 182, 226}, // char        
+    (Color){200, 182, 226}, // unsigned    
+    (Color){200, 182, 226}, // long        
+    (Color){200, 182, 226}, // enum        
+    (Color){200, 182, 226}, // struct      
+    (Color){200, 182, 226}, // union       
+    (Color){200, 182, 226}, // typedef     
+
+    (Color){181, 20, 111}, // IDENTIFIER  
+    (Color){254, 177, 57}, // STRING      
+    (Color){240, 220, 255}, // NUMBER      
+    (Color){255, 255, 255}, // TRUE        
+    (Color){255, 255, 255}, // FALSE       
+    (Color){255, 255, 255}, // NULL   
+     
+    (Color){20, 178, 244}, // return      
+    (Color){20, 178, 244}, // do          
+    (Color){20, 178, 244}, // while       
+    (Color){20, 178, 244}, // for         
+    (Color){20, 178, 244}, // if          
+    (Color){20, 178, 244}, // else        
+    (Color){170, 20, 244}, // preproc
+
+    (Color){255, 255, 255}, // WHITE_SPACE 
+    (Color){255, 255, 255}, // TAB_SPACE   
+    (Color){255, 255, 255}, // CARR_SPACE  
+    (Color){255, 255, 255}, // NEW_LINE    
+};
+
 void render_char(State* state, Font* f, char ch, int x, int y, float scale, Color color){
     SDL_Texture* tex = SDL_CreateTextureFromSurface(state->rend, f->glyphs[ch - MIN_CHARS]);
     SDL_SetTextureColorMod(tex, color.r, color.g, color.b);
@@ -37,31 +114,17 @@ void render_char(State* state, Font* f, char ch, int x, int y, float scale, Colo
     SDL_DestroyTexture(tex);
 }
 
-// void render_word(State* state, Font* f, const char* text, int x, int y, float scale){
-//     size_t n = strlen(text);
-//     int xoff = 0;
-//     for (size_t i = 0; i < n; i++){
-//         render_char(state, f, text[i], x + xoff * (int)(f->charWidth * scale), y, scale, 255, 255, 255);
-//         xoff++;
-//     }   
-// }
-
 void render_text(State* state, Font* f, TokenList* list, int x, int y, float scale){
     SDL_SetRenderDrawColor(state->rend, 51, 51, 51, 51);
     SDL_RenderClear(state->rend);
-
-    // size_t len = strlen(text);
-    // char dup[len];
-    // strcpy(dup, text);
-    // char* tok = strtok(dup, " ");
 
     int yoff = 0;
     int xoff = 0;
     
 
     for (size_t j = 0; j < list->index; j++){
-        // printf("%s\n", tok);
-
+        
+        Color c = palette[list->tokens[j].type];
         size_t n = strlen(list->tokens[j].lexeme);
         for (size_t i = 0; i < n; i++){
             if (list->tokens[j].type == NEW_LINE){
@@ -69,36 +132,14 @@ void render_text(State* state, Font* f, TokenList* list, int x, int y, float sca
                 xoff = 0;
                 continue;
             }
-            // if (x + xoff * (int)(f->charWidth * scale) > WIDTH - x){
-            //     yoff += (int)(f->charHeight * scale);
-            //     xoff = 0;
-            // }
-            render_char(state, f, list->tokens[j].lexeme[i], x + xoff * (int)(f->charWidth * scale), y + yoff, scale, list->tokens[j].c);
+            if (x + xoff * (int)(f->charWidth * scale) > WIDTH - x){
+                yoff += (int)(f->charHeight * scale);
+                xoff = 0;
+            }
+            render_char(state, f, list->tokens[j].lexeme[i], x + xoff * (int)(f->charWidth * scale), y + yoff, scale, c);
             xoff++;
         }
-        // xoff++;
-    }
-    //     // render_word(state, f, tok, x + xoff * (int)(f->charWidth * scale), y+yoff, scale);
-    //     // xoff += strlen(tok);
-    //     tok = strtok(NULL, " ");
-    // }
-
-    // size_t n = strlen(text);
-    // int yoff = 0;
-    // int xoff = 0;
-    // for (size_t i = 0; i < n; i++){
-    //     if (text[i] == '\n'){
-    //         yoff += (int)(f->charHeight * scale);
-    //         xoff = 0;
-    //         continue;
-    //     }
-    //     if (x + xoff * (int)(f->charWidth * scale) > WIDTH - x){
-    //         yoff += (int)(f->charHeight * scale);
-    //         xoff = 0;
-    //     }
-    //     render_char(state, f, text[i], x + xoff * (int)(f->charWidth * scale), y + yoff, scale, i*100, 0, i+60);
-    //     xoff++;
-    // }   
+    } 
 
     SDL_RenderPresent(state->rend);
 }

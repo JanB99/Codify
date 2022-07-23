@@ -43,7 +43,6 @@ typedef struct {
 typedef struct {
     enum TokenType type;
     char* lexeme;
-    Color c;
 } Token;
 
 typedef struct {
@@ -51,8 +50,6 @@ typedef struct {
     size_t index;
     size_t max;
 } TokenList;
-
-
 
 #define HASH_SIZE 100
 typedef struct nlist Hashlist;

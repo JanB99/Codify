@@ -10,7 +10,7 @@ $ git clone https://github.com/Janko-dev/Codify.git
 $ make
 $ ./codify resources/helloworld.c
 ```
-![Alt text](resources/codify.png "Example hello world program")
+![Example hello world program](/resources/codify_example.png "Example hello world program")
 
 The color palette can be adjusted in `graphics.c`
 

@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/jan/dev/Codify'
+gcc src/main.c src/graphics.c src/lexer.c -o out -Wall -Wextra -g -std=c99 `pkg-config --cflags --libs sdl2` -lSDL2_image -lSDL2_ttf
+./out 
+make: Leaving directory '/home/jan/dev/Codify'
+ 

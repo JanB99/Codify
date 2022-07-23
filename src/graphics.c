@@ -30,33 +30,75 @@ void handleEvents(State* state){
     }
 }
 
-void render_char(State* state, Font* f, char ch, int x, int y, float scale){
+void render_char(State* state, Font* f, char ch, int x, int y, float scale, Color color){
     SDL_Texture* tex = SDL_CreateTextureFromSurface(state->rend, f->glyphs[ch - MIN_CHARS]);
-    SDL_SetTextureColorMod(tex, 255, 0, 0);
+    SDL_SetTextureColorMod(tex, color.r, color.g, color.b);
     SDL_RenderCopy(state->rend, tex, NULL, &(SDL_Rect){x, y, (int)(f->charWidth * scale), (int)(f->charHeight * scale)});
     SDL_DestroyTexture(tex);
 }
 
-void render_text(State* state, Font* f, const char* text, int x, int y, float scale){
+// void render_word(State* state, Font* f, const char* text, int x, int y, float scale){
+//     size_t n = strlen(text);
+//     int xoff = 0;
+//     for (size_t i = 0; i < n; i++){
+//         render_char(state, f, text[i], x + xoff * (int)(f->charWidth * scale), y, scale, 255, 255, 255);
+//         xoff++;
+//     }   
+// }
+
+void render_text(State* state, Font* f, TokenList* list, int x, int y, float scale){
     SDL_SetRenderDrawColor(state->rend, 51, 51, 51, 51);
     SDL_RenderClear(state->rend);
 
-    size_t n = strlen(text);
+    // size_t len = strlen(text);
+    // char dup[len];
+    // strcpy(dup, text);
+    // char* tok = strtok(dup, " ");
+
     int yoff = 0;
     int xoff = 0;
-    for (size_t i = 0; i < n; i++){
-        if (text[i] == '\n'){
-            yoff += (int)(f->charHeight * scale);
-            xoff = 0;
-            continue;
+    
+
+    for (size_t j = 0; j < list->index; j++){
+        // printf("%s\n", tok);
+
+        size_t n = strlen(list->tokens[j].lexeme);
+        for (size_t i = 0; i < n; i++){
+            if (list->tokens[j].type == NEW_LINE){
+                yoff += (int)(f->charHeight * scale);
+                xoff = 0;
+                continue;
+            }
+            // if (x + xoff * (int)(f->charWidth * scale) > WIDTH - x){
+            //     yoff += (int)(f->charHeight * scale);
+            //     xoff = 0;
+            // }
+            render_char(state, f, list->tokens[j].lexeme[i], x + xoff * (int)(f->charWidth * scale), y + yoff, scale, list->tokens[j].c);
+            xoff++;
         }
-        if (x + xoff * (int)(f->charWidth * scale) > WIDTH - x){
-            yoff += (int)(f->charHeight * scale);
-            xoff = 0;
-        }
-        render_char(state, f, text[i], x + xoff * (int)(f->charWidth * scale), y + yoff, scale);
-        xoff++;
-    }   
+        // xoff++;
+    }
+    //     // render_word(state, f, tok, x + xoff * (int)(f->charWidth * scale), y+yoff, scale);
+    //     // xoff += strlen(tok);
+    //     tok = strtok(NULL, " ");
+    // }
+
+    // size_t n = strlen(text);
+    // int yoff = 0;
+    // int xoff = 0;
+    // for (size_t i = 0; i < n; i++){
+    //     if (text[i] == '\n'){
+    //         yoff += (int)(f->charHeight * scale);
+    //         xoff = 0;
+    //         continue;
+    //     }
+    //     if (x + xoff * (int)(f->charWidth * scale) > WIDTH - x){
+    //         yoff += (int)(f->charHeight * scale);
+    //         xoff = 0;
+    //     }
+    //     render_char(state, f, text[i], x + xoff * (int)(f->charWidth * scale), y + yoff, scale, i*100, 0, i+60);
+    //     xoff++;
+    // }   
 
     SDL_RenderPresent(state->rend);
 }

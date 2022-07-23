@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "lexer.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -13,7 +14,10 @@
 #define HEIGHT 800
 
 #define MAX_CHARS 128
-#define MIN_CHARS 0
+#define MIN_CHARS 32
+
+// #define MIN_UC 0x0410
+// #define MAX_UC 0x044f
 
 typedef struct {
     SDL_Window* window;
@@ -31,7 +35,7 @@ typedef struct {
 State* init(const char* title, int width, int height);
 void clean(State* state, Font* f);
 void handleEvents(State* state);
-void render_text(State* state, Font* f, const char* text, int x, int y, float scale);
+void render_text(State* state, Font* f, TokenList* list, int x, int y, float scale);
 
 char* loadFile(const char* path);
 Font* init_font(const char* path);

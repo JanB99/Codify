@@ -6,7 +6,7 @@ These tokens can be customized by changing the color attributes.
 ## Quick start Linux
 
 ```
-$ git clone https://github.com/Janko-dev/Codify.git
+$ git clone https://github.com/Janko-dev/codify.git
 $ make
 $ ./codify resources/helloworld.c
 ```
